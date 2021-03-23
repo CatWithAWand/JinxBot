@@ -54,17 +54,16 @@ module.exports = {
 		}
 		if (member.voice.channel && (member.voice.channel.id == voiceConnection.channel.id)) {
 			if (text > 200) {
-				errorEmbed1.setDescription(`Text max character limit is 200, your text had ${text}.`);
-				return interactionReply(interaction, { type: 4, embeds: errorEmbed1 });
-			}
-			const audio = await speechSynthesis.execute(text);
-			if (audio instanceof Error) {
-				console.log(`error?`);
-				console.error(audio);
+				errorEmbed1.setDescription(`Text max character limit is 200, your text had **${text.length}**.`);
+				interactionReply(interaction, { type: 4, embeds: errorEmbed1 });
+				text = `Text max character limit is 200, your text had ${text.length}`;
 			}
 			else {
-				interactionReply(voiceConnection, { audio: audio });
+				successEmbed1.setDescription(`Now saying **${text}**`);
+				interactionReply(interaction, { type: 4, embeds: successEmbed1 });
 			}
+			const audio = await speechSynthesis.execute(text);
+			interactionReply(voiceConnection, { audio: audio });
 		}
 		else {
 			return interactionReply(interaction, { type: 4, content: `Please connect to my voice channel in order to use that command.\n(Note: You cannot use this command from a different voice channel!)`, flags: 1 << 6 });

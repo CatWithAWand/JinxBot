@@ -19,9 +19,6 @@ module.exports = {
 		}
 		if (interaction.constructor.name === `VoiceConnection`) {
 			audio = await speechSynthesis.execute(response);
-			if (audio instanceof Error) {
-				console.error(audio);
-			}
 		}
 		interactionReply(interaction, { content: response, audio: audio });
 	},

@@ -32,9 +32,6 @@ module.exports = {
 				if (interaction.constructor.name === `VoiceConnection`) {
 					const response = config.intent_response.leave[Math.floor(Math.random() * config.intent_response.leave.length)].toString();
 					const audio = await speechSynthesis.execute(response);
-					if (audio instanceof Error) {
-						return console.error(audio);
-					}
 
 					const dispatcher = voiceConnection.play(audio);
 					dispatcher.on(`finish`, () => {

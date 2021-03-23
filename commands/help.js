@@ -32,12 +32,14 @@ module.exports = {
 				.setDescription(`Here's a list of all my slash commands.\nYou can execute "/help dm: True command: <command_name>" to get more information regarding a specific command and its usage.`);
 
 			commands.forEach((command) => {
-				embed.addField(command.name, command.description, false);
+				if (command.options) {
+					embed.addField(command.name, command.description, false);
+				}
 			});
 		}
 		else {
 			const command = commands.get(interaction.data.options[1].value) || commands.find(c => c.aliases && c.aliases.includes(interaction.data.options[1].value));
-			if (!command) {
+			if (!command || !command.options) {
 				errorEmbed1
 					.setTitle(`Command not found!`)
 					.setDescription(`Could not find slash command with name **${interaction.data.options[1].value}**`);

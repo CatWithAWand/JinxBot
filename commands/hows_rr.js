@@ -10,9 +10,6 @@ module.exports = {
 		const response = config.intent_response.hows_rr[Math.floor(Math.random() * config.intent_response.hows_rr.length)].toString();
 		if (interaction.constructor.name === `VoiceConnection`) {
 			audio = await speechSynthesis.execute(response);
-			if (audio instanceof Error) {
-				console.error(audio);
-			}
 		}
 		interactionReply(interaction, { content: response, audio: audio });
 	},

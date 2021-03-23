@@ -21,7 +21,6 @@ async function updateJson(num) {
 function synthesize(text) {
 	return new Promise(function(resolve, reject) {
 		const config = importFresh(`../config.json`);
-		console.log(config.speech_quota_usage + text.length);
 		if ((config.speech_quota_usage + text.length) >= 450000) {
 			return reject(new Error(`reached_quota_limit`));
 		}
@@ -38,15 +37,13 @@ function synthesize(text) {
 		xml.replace(`%pitch`, config.speech_pitch);
 		*/
 
-		const ssml = `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="${config.speech_lang}"><voice name="Microsoft Server Speech Text to Speech Voice (${config.speech_lang}, ${config.speech_voice})"><prosody rate="${config.speech_rate}" pitch="${config.speech_pitch}">${text}</prosody></voice></speak>`;
+		const ssml = `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="${config.speech_lang}"><voice name="Microsoft Server Speech Text to Speech Voice (${config.speech_lang}, ${config.speech_voice})"><prosody rate="${config.speech_rate}%" pitch="${config.speech_pitch}%">${text}</prosody></voice></speak>`;
 
-		console.log(`before synthSsmlAync`);
 		synthesizer.speakSsmlAsync(
 			ssml,
 			result => {
 				synthesizer.close();
 				if (result) {
-					console.log(`filename is speech/synthesis_audios/${id}.ogg`);
 					updateJson(text.length);
 					return resolve(`speech/synthesis_audios/${id}.ogg`);
 				}
@@ -66,9 +63,9 @@ module.exports = {
 			if (err.message === `reached_quota_limit`) {
 				return `speech/synthesis_audios/error_quota_limit.ogg`;
 			}
-			return err;
+			console.error(err);
+			return `speech/synthesis_audios/error_speech_synthesis.ogg`;
 		});
-		console.log(audio);
 		return audio;
 	},
 };

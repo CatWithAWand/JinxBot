@@ -5,8 +5,11 @@
     "token": "ODIwNzI5MzUyNzkzNjIwNTIw.YE5Zxg.6pQuFZq46asVDi_V8OIBaS0nvwY",
     "witai_token": "ERKJEZSPN6QUZKZJ3FPVWUO2PPSHUS2Z",
     "cognitiveservices_speech_key": "842b3f8bbec6454aa752414950c3d000",
+    "moderators": [
+        "107697492509888512",
+        "670259907022553100"
+    ],
     "interaction_source": "true",
-    "home_channel": "811236566189867048",
     "activities": [
         "Guild Wars 2",
         "alacren",
@@ -19,8 +22,8 @@
     ],
     "speech_lang": "en-IN",
     "speech_voice": "PrabhatNeural",
-    "speech_rate": "-8.00%",
-    "speech_pitch": "+6.00%",
+    "speech_rate": "-8",
+    "speech_pitch": "+6",
     "speech_quota_usage": 3881,
     "intent_response": {
         "hows_alacrity": [
@@ -96,5 +99,6 @@
         "sabir_video": "https://cdn.discordapp.com/attachments/823687600426319892/823687890634539049/Jinx-Sabir.mp4",
         "adina_video": "https://cdn.discordapp.com/attachments/823687600426319892/823688337474453514/Jinx-Adina.mp4",
         "favorite_place_image": "https://cdn.discordapp.com/attachments/823687600426319892/823690083290578974/Jinx-Isle.jpg"
-    }
+    },
+    "home_channel": "809417833380708385"
 }

@@ -4,7 +4,6 @@ const config = require(`./config.json`);
 const Schedule = require(`node-schedule`);
 const { Wit, log } = require(`node-wit`);
 const { interactionReply, errorEmbed } = require(`./helper.js`);
-const { types } = require("util");
 
 // Discord bot
 const myIntents = new Discord.Intents();
@@ -39,15 +38,6 @@ const botActivity = Schedule.scheduleJob(`*/10 * * * *`, function() {
 Bot.once(`ready`, async () => {
 	Bot.user.setPresence({ status: `online`, activity: { name: `it's Alacrity time` } });
 	console.log(`Bot is online!`);
-	// Register slash commands
-
-	Bot.api.applications(Bot.user.id).guilds(`809417833380708382`).commands.post({ data: {
-		name: `leave`,
-		description: `Force the bot to leave from the voice channel it's connected.`,
-		options: [
-		],
-	} });
-
 });
 
 // On guild join listener

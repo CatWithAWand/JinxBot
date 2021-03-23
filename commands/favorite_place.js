@@ -14,9 +14,6 @@ module.exports = {
 		if (interaction.constructor.name === `VoiceConnection`) {
 			const replyChannel = await Bot.channels.fetch(config.home_channel);
 			const audio = await speechSynthesis.execute(response);
-			if (audio instanceof Error) {
-				console.error(audio);
-			}
 			interactionReply(interaction, { audio: audio });
 			return replyChannel.send(image);
 		}

@@ -22,11 +22,8 @@ module.exports = {
 		let timeout = null;
 
 		function postToWitAi(audioData) {
-			console.log(`sending axios`);
-			// console.log(data);
 			// const formData = new FormData();
 			// formData.append(`file`, audioData, { knownLength: audioData.length });
-			console.log(audioData.length);
 			const axios_witaispeech = {
 				headers: {
 					'Content-Type': `audio/raw;encoding=signed-integer;bits=16;rate=16000;endian=little`,
@@ -36,11 +33,8 @@ module.exports = {
 				},
 				// ...formData.getHeaders(),
 			};
-			console.log(`sending request`);
 			axios.post(`https://api.wit.ai/speech`, audioData, axios_witaispeech)
 				.then(function(response) {
-					console.log(`response`);
-					console.log(JSON.stringify(response.data));
 					const command = Bot.commands.find(cmd => cmd.intentID === response.data.intents[0].id);
 
 					if(!command) return;
@@ -57,7 +51,6 @@ module.exports = {
 			userDetection[user].counter = 0;
 			userDetection[user].buffer = Buffer.concat([userDetection[user].buffer, audioData]);
 			if (userDetection[user].buffer.length >= 192000) {
-				console.log(`>=192000 met, emptying...`);
 				postToWitAi(userDetection[user].buffer, user);
 				userDetection[user].buffer = Buffer.alloc(0);
 			}
@@ -65,23 +58,15 @@ module.exports = {
 			timeout = setInterval(async function() {
 				if (sum <= 1000) {
 					userDetection[user].counter++;
-					console.log(userDetection[user].counter);
 				}
 				if (userDetection[user].counter === 8) {
-					console.log(`Silence detected`);
 					clearInterval(timeout);
 					interactionReply(connection, { audio: `resources/sound-effects/activation.ogg` });
 					await postToWitAi(userDetection[user].buffer, user);
 					try {
-						console.log(`reseting buffer`);
 						userDetection[user].detected = false;
 						guildServicing[guild] = false;
 						userDetection[user].buffer = Buffer.alloc(0);
-						// Delete audio file
-						/* fs.unlink(<audiofilegoeshere>, function(err) {
-								if (err) throw err;
-							});
-						*/
 					}
 					catch(error) {
 						console.error(error);
@@ -140,7 +125,6 @@ module.exports = {
 
 					// If silent and user is detected, initiate silence detection
 					if (userDetection[user].detected && guildServicing[userDetection[user].guild]) {
-						console.log(`in if detected && guild servicing`);
 						const sum = newFrames16.reduce(function(acc, val) { return acc + val; }, 0);
 						silenceDetection(data, sum, user, userDetection[user].guild);
 					}
@@ -149,14 +133,11 @@ module.exports = {
 						const index = userHandlers[user].process(frame);
 						if (index !== -1) {
 							// Wake word detected
-							// connection.play(`resources/sound-effects/wakeword_detected.ogg`);
 							interactionReply(connection, { audio: `resources/sound-effects/wakeword_detected.ogg` });
 							if (!userDetection[user].detected && !guildServicing[userDetection[user].guild]) {
-								console.log(`in if !detected && !guild servicing`);
 								userDetection[user].detected = true;
 								guildServicing[userDetection[user].guild] = true;
 							}
-							// console.log(`Wake word detected!`);
 						}
 					}
 				});

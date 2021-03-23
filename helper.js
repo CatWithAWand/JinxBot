@@ -33,7 +33,6 @@ module.exports = {
 					const dispatcher = interaction.play(fs.createReadStream(reply.audio, { type: `ogg/opus` }));
 					dispatcher.on(`finish`, () => {
 						if(/\/([0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\./i.test(reply.audio)) {
-							console.log(`true`);
 							fs.unlink(reply.audio, function(err) {
 								if (err) throw err;
 							});
