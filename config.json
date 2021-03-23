@@ -1,0 +1,100 @@
+{
+    "prefix": "j/",
+    "permissions": "2818571840",
+    "invite_link": "https://discord.com/api/oauth2/authorize?client_id=820729352793620520&permissions=2818571840&scope=bot%20applications.commands",
+    "token": "ODIwNzI5MzUyNzkzNjIwNTIw.YE5Zxg.6pQuFZq46asVDi_V8OIBaS0nvwY",
+    "witai_token": "ERKJEZSPN6QUZKZJ3FPVWUO2PPSHUS2Z",
+    "cognitiveservices_speech_key": "842b3f8bbec6454aa752414950c3d000",
+    "interaction_source": "true",
+    "home_channel": "811236566189867048",
+    "activities": [
+        "Guild Wars 2",
+        "alacren",
+        "Sabir tornado catching",
+        "Tut-o-matorT69",
+        "Adina and chill",
+        "practicing RR",
+        "awaiting for you...",
+        "Guild Wars 3 Beta"
+    ],
+    "speech_lang": "en-IN",
+    "speech_voice": "PrabhatNeural",
+    "speech_rate": "-8.00%",
+    "speech_pitch": "+6.00%",
+    "speech_quota_usage": 3881,
+    "intent_response": {
+        "hows_alacrity": [
+            "40% Alacrity I feel is good for this",
+            "I feel 42% alacrity is good for this",
+            "Maybe 41% alacrity will be good for this"
+        ],
+        "drop_from_team": [
+            "I am planning on moving to NA server bro",
+            "Bro, I'm moving to NA servers",
+            "Oh, anyway I'm moving to NA so..."
+        ],
+        "buy_raids": [
+            "I only paid of Qadim 1 I swear, I cleared Dhuum CM on my thief in an old guild.",
+            "Qadim 1 was the only thing I paid for I swear, in an old guild I cleared Dhuum CM on my thief",
+            "Bro I buy Qadim 1, but Dhuum CM I killed with my thief in an old guild"
+        ],
+        "alacrity_bad": [
+            "I will try to press my F4 more often, But I seem to have issue on this boss dpsing and doing it and then doing mechanics on top of that",
+            "I press F4 I swear, I have problem dpsing, doing alacrity and doing mechanics",
+            "I try me best press F4 but mechanics and dpsing is hard when give alacrity"
+        ],
+        "hows_things": [
+            "Bro I am so greatful to be in your guild, and hopefully it will develop me as a better alac ren",
+            "It's challenging but I will become good alacrity here",
+            "Here I become god alac ren, give alacrity, do mechanics, and dpsing!"
+        ],
+        "hows_rr": [
+            "24 k with 79% uptime is Gg!",
+            "Bro I do 25 k with 77% alacrity is perfect!",
+            "24.2 K dps very good and 80% alacrity, bro it's gg!",
+            "I practice all day, bro It's very good dpsing and alacrity 23 k and 70%",
+            "I am trying the rotation with my alac will keep up with the skills but couldn't keep up the damage"
+        ],
+        "its_encounter_time": {
+            "sabir": [
+                "Ok, here we go Super Jinxio time!",
+                "Oh my god engage Super Jinxio!"
+            ],
+            "adina": [
+                "Oh no, it's sand pit time",
+                "My bubble is ready",
+                "Okay bro, I read snow crows guide, I'm ready"
+            ]
+        },
+        "encounter_do": {
+            "sabir": [
+                "Ok, bro listen, for Sabir you need to have big air time combo!",
+                "Watch and learn!",
+                "I done Sabir 100 times, dpsing and mechanics still have problem"
+            ],
+            "adina": [
+                "Watch and learn!",
+                "Put buble, press F4, dpsing. OH MY GOD! I make mistake again",
+                "I'm telling you bro, I no read this bubble thing in snow crows guide"
+            ]
+        },
+        "not_using_elite": [
+            "I have not seen someone using it before after checking guide",
+            "Bro, I not see snow crows use it",
+            "I only practice rotation from dulfy.net"
+        ],
+        "favorite_place": [
+            "My favorite place in game is the Jinx Isle!",
+            "Bro I'm telling you there is no place like home, the Jinx Isle",
+            "Jinx Isle, free from torandos and sand"
+        ],
+        "leave": [
+            "Disconnecting!",
+            "Good byee",
+            "Alright bro I'm leaving"
+        ],
+        "sabir_video": "https://cdn.discordapp.com/attachments/823687600426319892/823687890634539049/Jinx-Sabir.mp4",
+        "adina_video": "https://cdn.discordapp.com/attachments/823687600426319892/823688337474453514/Jinx-Adina.mp4",
+        "favorite_place_image": "https://cdn.discordapp.com/attachments/823687600426319892/823690083290578974/Jinx-Isle.jpg"
+    }
+}

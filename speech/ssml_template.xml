@@ -1,0 +1,2 @@
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"637ffba4-caa2-436e-a6d1-fda7a339eafe","Name":"Microsoft Server Speech Text to Speech Voice (en-IN, PrabhatNeural)","VoiceType":"StandardVoice"}]}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-IN"><voice name="Microsoft Server Speech Text to Speech Voice (en-IN, PrabhatNeural)"><prosody rate="%rate%" pitch="%pitch%">%text%</prosody></voice></speak>
