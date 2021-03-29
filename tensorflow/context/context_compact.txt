@@ -1,0 +1,28 @@
+The Vale Divisions are a group of three distinctly colored Guardians (Blue, Red, Green).
+Red Guardian: "It has extremely high toughness rendering damage other than Condition Damage ineffective to the point of dealing single-digit damage".
+Green Guardian: "It creates small blue fields under nearby players every 10 seconds that have a distinct sound effect and will detonate after 2-3 seconds teleporting and damaging players inside them". Green Guardian's special mechanic is "Unstable Magic Spike".
+Blue Guardian: "It has Blue Pylon Power which grants immunity to Blue Guardian the effect can be stripped or corrupted". Blue Guardian regains Blue Pylon Power every 10 seconds. Blue Guardian's special mechanic is "Distributed Magic".
+Vale Guardian: "Vale Guardian, it is an amalgamation of the three previous Vale Divisions with a few changes to their mechanics". Vale Guardian's health is 22021440. Vale Guardian's enrage: "Timer is 8 minutes. And the effect increases damage dealt by 200%". Vale Guardian aggro is toughness based. Vale Guardian has 5 phases.
+Seekers: "Seekers they will spawn in the center of each tile around the arena and slowly gravitate towards a player they disappear after 20 seconds and a new set will spawn". Some common utilities for managing/dealing with seekers include a Chronomancer's Temporal Curtain and a Druid's Glyph of the Tides, players can also immobilize them with a Druid's Entangle and Natural Convergence.
+Unstable Magic Spike or blue circles: "Will deal a large amount of damage and teleport you to a random place around the arena".
+Distributed Magic or green circles: "Requires a minimum of four players inside them or else everyone in the arena will take 80% of their health as damage".
+There are a few common strategies for tanking Vale Guardian: "Tile center, line, and center".
+Tile Center strategy: is commonly chosen if the squad chooses to have 4 players stand in every green the tank tanks near the center of an edge of a tile such as near a Speed Boost Mushroom for the players that have trained the Blazing Speed Mushrooms mastery.
+Line strategy: is commonly chosen if the squad chooses to out heal the green the tank stands on the edge of the circle on a line between two tiles.
+Center strategy: is extremely risky and is only recommended if the squad can out heal the green and effectively deal with moving out and/or immobilizing the seekers the tank will tank in the center of the arena.
+
+Gorseval's health is 21628200. Gorseval's enrage: "Timer is 7 minutes. And the effect removes all updrafts and gains increased damage dealt by 200%". Gorseval aggro is toughness based. Gorseval has 3 phases.
+Once the fight starts, Spirit Barriers will be erected around the platform and four Updraft updrafts will spawn in each corner. Gorseval has two main attacks, a swipe, which deals a small amount of damage to players in front, and a slam, which deals a moderate amount of damage and knocks back all nearby players, the knock back can be avoided with Aegis or Stability.
+Vivid Echo: "Reflects incoming damage can't be removed".
+Protective Shadow: "is an effect applied to Gorseval at 66% and 33% phases when he summons four Charged Souls and becomes invulnerable".
+Charged Souls: "Will spawn northeast, southeast, southwest, and northwest and begin walking towards Gorseval if a spirit reaches Gorseval he will immediately begin his World Eater attack".
+Spectral Darkness (or orbs): "is an effect applied by the orbs one orb will grant a stack of 10 Spectral Darkness effect, the player must walk into two golden orbs to remove the 10 stacks".
+Ghastly Prison (or eggs): "is an effect applied when the player gets trapped the prison can be broken through Rebel and other player's attacks".
+
+Sabetha's health is 34015256. Sabetha's enrage: "Timer is 9 minutes. And the effect is all four cannons become active and gains increased damage dealt by 500%".
+Flak Shot: "Will always target the furthest player from herself As such it is important to have one dedicated flak kiter".
+Time bomb: "At the start of each Sabetha phase and every 15 seconds (except during a Flamewall) time bomb will always be placed on the player closest to Sabetha".
+Flamewall: "Every 45 seconds in the direction of a random player Sabetha spawn a flame wall which will rotate 360 degrees counter-clockwise around the platform, players that touch the wall are immediately defeated".
+Cannons and Sapper bombs: "Throughout the fight cannons will spawn every 30 seconds in a fixed pattern, which alternate after the previous one has finished". The first cannons pattern is South West North East, and the second pattern is South North West East".
+A Bandit Sapper will spawn periodically on the side of the platform opposite of the next cannon. They will mark the west-most player within their range and give them a special action skill Sapper Bomb, which are used to launch players up to the cannons. 
+At 75%, 50%, and 25%, Sabetha will shadowstep off the platform and one of her champions will take her place.  Sabetha's champions are: "Kernan, Knuckles, and Karde". Kernan's health is 3440850. Kernan's mechanic is every few seconds she will fire three consecutive cone attacks in one direction. Knuckle's health is 3440850. Knuckle's mechanic is every 30 seconds knuckles will charge up a hammer swing and unlock his Defiance bar failure to break this bar will knock all players up and push them outwards. Karde's health is 4423950. Karde's mechanic is a flamethrower attack and flame turrets which shoot out projectiles.

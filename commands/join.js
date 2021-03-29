@@ -16,12 +16,13 @@ module.exports = {
 		let member = {};
 		switch (interaction.constructor.name) {
 		case `Object`:
-			await Bot.guilds.fetch(interaction.guild_id)
-				.then((guild) => {
-					guild.members.fetch(interaction.member.user.id)
+			Bot.guilds.cache.get(interaction.guild_id)
+				.then(async (guild) => {
+					await guild.members.fetch(interaction.member.user.id)
 						.then((mbr) => {
 							member = mbr;
-						});
+						})
+						.catch((error) => console.error(error));
 				});
 			break;
 		case `Message`:
@@ -31,11 +32,18 @@ module.exports = {
 			return;
 		}
 		if (member.voice.channel) {
+			if (Bot.voice.connections.find(connection => connection.channel.members.has(member.id))) {
+				return interactionReply(interaction, { type: 4, content: `I am already connected to your channel`, flags: 1 << 6 });
+			}
 			try {
-				const connection = await member.voice.channel.join();
-				voiceComprehension.execute(connection, member);
+				const voiceConnection = await member.voice.channel.join();
+				console.log(`creating`);
+				voiceConnection.channel.members.forEach((mbr) => {
+					voiceComprehension.initiate(voiceConnection, mbr.user, mbr.guild.id);
+				});
+				console.log(`next`);
 				if (config.interaction_source) {
-					successEmbed1.setDescription(`Connected to **${connection.channel.name}** successfully.`);
+					successEmbed1.setDescription(`Connected to **${voiceConnection.channel.name}** successfully.`);
 					return interactionReply(interaction, { type: 4, embeds: successEmbed1 });
 				}
 				else {

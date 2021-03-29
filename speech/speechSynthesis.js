@@ -58,7 +58,7 @@ function synthesize(text) {
 module.exports = {
 	name: `speechSynthesis`,
 	description: ``,
-	execute : (text) => {
+	execute: (text) => {
 		const audio = synthesize(text).catch((err) => {
 			if (err.message === `reached_quota_limit`) {
 				return `speech/synthesis_audios/error_quota_limit.ogg`;

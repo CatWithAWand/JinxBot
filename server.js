@@ -3,6 +3,8 @@ const Discord = require(`discord.js`);
 const config = require(`./config.json`);
 const Schedule = require(`node-schedule`);
 const { Wit, log } = require(`node-wit`);
+const voiceComprehension = require(`./speech/voiceComprehension`);
+// const qna = require(`./tensorflow/qna.js`);
 const { interactionReply, errorEmbed } = require(`./helper.js`);
 
 // Discord bot
@@ -18,6 +20,7 @@ const WitAI = new Wit({
 
 // Other constants
 const activities = config.activities;
+Bot.connUsers = new Discord.Collection();
 
 // Load commands
 Bot.commands = new Discord.Collection();
@@ -31,12 +34,13 @@ for (const file of commandFiles) {
 // Schedule jobs
 // eslint-disable-next-line no-unused-vars
 const botActivity = Schedule.scheduleJob(`*/10 * * * *`, function() {
-	Bot.user.setPresence({ status: `online`, activity: { name: activities[Math.floor(Math.random() * activities.length)].toString() } });
+	Bot.user.setActivity(activities[Math.floor(Math.random() * activities.length)].toString(), { type: `PLAYING` });
 });
 
 // On bot ready listener
 Bot.once(`ready`, async () => {
-	Bot.user.setPresence({ status: `online`, activity: { name: `it's Alacrity time` } });
+	Bot.user.setActivity(`it's Alacrity time`, { type: `PLAYING` });
+	// qna.load();
 	console.log(`Bot is online!`);
 });
 
@@ -88,16 +92,15 @@ Bot.on(`guildCreate`, async (guild) => {
 	});
 });
 
-
 // On message listener
 Bot.on(`message`, async (message) => {
 	try {
 		// Exit if the author is the bot or the bot is not mentioned
 		if (message.author.bot || !message.mentions.has(Bot.user)) return;
 
-		// Wit.ai integration with Discord. Nice nice nice!
 		// Remove bot mention
 		const msg = message.content.replace(`<@!${Bot.user.id}>`, ``);
+		// WitAI api call
 		await WitAI.message(msg, {}).then(async (data) => {
 			const command = Bot.commands.find(cmd => cmd.intentID === data.intents[0].id);
 
@@ -165,6 +168,49 @@ Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
 	catch(err) {
 		console.error(err);
 	}
+});
+
+// On voiceStateUpdate listener
+// This is used to initiate/destroy voice comprehension handlers dynamically
+Bot.on(`voiceStateUpdate`, async (oldState, newState) => {
+	// Ignore bot's voiceStateUpdate states
+	if (newState.id === Bot.user.id) return;
+
+	if (oldState.channelID == null) {
+		// Connected to a voice channel
+		if (Bot.connUsers.get(newState.id)) return;
+		// If the user already exists in the collection, user is already initiated
+		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
+		if (voiceConnection) {
+			if (voiceConnection.channel.members.has(newState.id)) {
+				// member is part of connection
+				await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+				// Initiate and create handlers for the user
+			}
+		}
+	}
+	else if (newState.channelID == null) {
+		// Disconnected from a voice channel
+		if (!Bot.connUsers.get(oldState.id)) return;
+		// If the user exists in the collection, user has handlers
+		await voiceComprehension.destroy(oldState.member.user);
+		// Destroy user's handlers
+	}
+	else if (newState.channelID != oldState.channelID) {
+		// Changed voice channel
+		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
+		if (voiceConnection) {
+			if (oldState.channelID === voiceConnection.channel.id) {
+				// User has left the connection channel
+				await voiceComprehension.destroy(oldState.member.user);
+			}
+			else if (newState.channelID === voiceConnection.channel.id) {
+				// User has joined the connection channel
+				await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+			}
+		}
+	}
+
 });
 
 // Login bot

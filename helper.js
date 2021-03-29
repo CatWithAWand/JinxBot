@@ -37,6 +37,7 @@ module.exports = {
 								if (err) throw err;
 							});
 						}
+						dispatcher.destroy();
 					});
 				}
 				catch (err) {
@@ -47,56 +48,44 @@ module.exports = {
 	},
 	rolecolorEmbed: async (guildID) => {
 		const { Bot } = require(`./server.js`);
-		let color = ``;
-		await Bot.guilds.fetch(guildID)
+		let color = `#2196f3`;
+		await Bot.guilds.cache.get(guildID)
 			.then((guild) => {
 				const role = guild.roles.highest;
 				color = role.hexColor;
 			})
 			.catch((err) => console.error(err));
-		const rolecolorEmbed = new Discord.MessageEmbed();
-		rolecolorEmbed
+		return new Discord.MessageEmbed()
 			.setColor(color)
 			.setThumbnail();
-		return rolecolorEmbed;
 	},
 	colorEmbed: (color) => {
-		const colorEmbed = new Discord.MessageEmbed();
-		colorEmbed
+		return new Discord.MessageEmbed()
 			.setColor(color)
 			.setThumbnail();
-		return colorEmbed;
 	},
 	infoEmbed: () => {
-		const infoEmbed = new Discord.MessageEmbed();
-		infoEmbed
+		return new Discord.MessageEmbed()
 			.setAuthor(`Information.`, `https://cdn.discordapp.com/attachments/815578278025756702/815578739026952202/information.png`)
 			.setColor(`#2196f3`)
 			.setThumbnail();
-		return infoEmbed;
 	},
 	successEmbed: () => {
-		const successEmbed = new Discord.MessageEmbed();
-		successEmbed
+		return new Discord.MessageEmbed()
 			.setAuthor(`Success!`, `https://cdn.discordapp.com/attachments/815578278025756702/815578768919101468/success.png`)
 			.setColor(`#4caf50`)
 			.setThumbnail();
-		return successEmbed;
 	},
 	warningEmbed: () => {
-		const warningEmbed = new Discord.MessageEmbed();
-		warningEmbed
+		return new Discord.MessageEmbed()
 			.setAuthor(`Warning!`, `https://cdn.discordapp.com/attachments/815578278025756702/815578795653464114/warning.png`)
 			.setColor(`#ff9800`)
 			.setThumbnail();
-		return warningEmbed;
 	},
 	errorEmbed: () => {
-		const errorEmbed = new Discord.MessageEmbed();
-		errorEmbed
+		return new Discord.MessageEmbed()
 			.setAuthor(`Error!`, `https://cdn.discordapp.com/attachments/815578278025756702/815578828738265138/error.png`)
 			.setColor(`#f44336`)
 			.setThumbnail();
-		return errorEmbed;
 	},
 };

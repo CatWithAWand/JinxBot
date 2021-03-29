@@ -24,12 +24,13 @@ module.exports = {
 		let text = ``;
 		switch (interaction.constructor.name) {
 		case `Object`:
-			await Bot.guilds.fetch(interaction.guild_id)
-				.then((guild) => {
-					guild.members.fetch(interaction.member.user.id)
+			Bot.guilds.cache.get(interaction.guild_id)
+				.then(async (guild) => {
+					await guild.members.fetch(interaction.member.user.id)
 						.then((mbr) => {
 							member = mbr;
-						});
+						})
+						.catch((error) => console.error(error));
 				});
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild_id);
 			text = interaction.data.options[0].value;

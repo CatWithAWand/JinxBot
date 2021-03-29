@@ -25,8 +25,11 @@
   },
   "homepage": "",
   "dependencies": {
-    "@discordjs/opus": "^0.4.0",
+    "@discordjs/opus": "^0.5.0",
     "@picovoice/porcupine-node": "^1.9.0",
+    "@tensorflow-models/qna": "^1.0.0",
+    "@tensorflow/tfjs-backend-cpu": "^3.3.0",
+    "@tensorflow/tfjs-node": "^3.3.0",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "deepai": "^1.0.17",
@@ -34,10 +37,10 @@
     "eslint": "^7.22.0",
     "form-data": "^4.0.0",
     "import-fresh": "^3.3.0",
-    "microsoft-cognitiveservices-speech-sdk": "^1.15.1",
+    "microsoft-cognitiveservices-speech-sdk": "^1.16.0",
     "node-schedule": "^2.0.0",
     "node-wit": "^6.0.1",
-    "prism-media": "^1.2.8",
+    "prism-media": "^1.2.9",
     "uuid4": "^2.0.2"
   }
 }

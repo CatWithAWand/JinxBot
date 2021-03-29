@@ -1,5 +1,6 @@
 const { interactionReply, successEmbed } = require(`../helper.js`);
 const speechSynthesis = require(`../speech/speechSynthesis.js`);
+const voiceComprehension = require(`../speech/voiceComprehension.js`);
 const config = require(`../config.json`);
 const fs = require(`fs`);
 
@@ -14,20 +15,34 @@ module.exports = {
 		const { Bot } = require(`../server.js`);
 		const successEmbed1 = successEmbed();
 		let voiceConnection = {};
+		let member = {};
 		switch (interaction.constructor.name) {
 		case `Object`:
+			Bot.guilds.cache.get(interaction.guild_id)
+				.then(async (guild) => {
+					await guild.members.fetch(interaction.member.user.id)
+						.then((mbr) => {
+							member = mbr;
+						})
+						.catch((error) => console.error(error));
+				});
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild_id);
 			break;
 		case `Message`:
+			member = interaction.member;
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild.id);
 			break;
 		case `VoiceConnection`:
+			member = interaction.member;
 			voiceConnection = interaction;
 			break;
 		default:
 			return;
 		}
 		if (voiceConnection) {
+			if (!voiceConnection.channel.members.has(member.id)) {
+				return interactionReply(interaction, { type: 4, content: `Only users connected to my channel can disconnect me!`, flags: 1 << 6 });
+			}
 			try {
 				if (interaction.constructor.name === `VoiceConnection`) {
 					const response = config.intent_response.leave[Math.floor(Math.random() * config.intent_response.leave.length)].toString();
@@ -36,6 +51,9 @@ module.exports = {
 					const dispatcher = voiceConnection.play(audio);
 					dispatcher.on(`finish`, () => {
 						dispatcher.destroy();
+						voiceConnection.channel.members.forEach((mbr) => {
+							voiceComprehension.destroy(mbr.user);
+						});
 						voiceConnection.disconnect();
 						fs.unlink(audio, function(err) {
 							if (err) throw err;
@@ -45,6 +63,9 @@ module.exports = {
 					dispatcher.on(`error`, console.error);
 				}
 				else {
+					voiceConnection.channel.members.forEach((mbr) => {
+						voiceComprehension.destroy(mbr.user);
+					});
 					voiceConnection.disconnect();
 					if (config.interaction_source) {
 						successEmbed1.setDescription(`Disconnected from **${voiceConnection.channel.name}** successfully.`);
