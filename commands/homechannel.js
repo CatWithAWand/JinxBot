@@ -38,13 +38,15 @@ module.exports = {
 		if (!config.moderators.includes(`${interaction.member.user.id}`)) {
 			return interactionReply(interaction, { type: 4, content: `You cannot execute this command! It's only for my moderators.`, flags: 1 << 6 });
 		}
+		const channelID = (interaction.data.options[0].name === `set`) ? interaction.data.options[0].options[0].value : config.home_channel;
+		let channel = null;
+		await Bot.channels.fetch(channelID)
+			.then((chnl) => channel = chnl)
+			.catch((error) => console.error(error));
 		if (interaction.data.options[0].name === `set`) {
-			console.log(interaction.data.options[0].options[0]);
-			const channel = await Bot.channels.fetch(interaction.data.options[0].options[0].value);
 			let embed = null;
 			try {
 				const data = JSON.parse(fs.readFileSync(`config.json`));
-				console.log(channel);
 				data.home_channel = channel.id;
 				fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
 				embed = successEmbed1.setDescription(`Successfully set **${channel.name}** as new home channel.`);
@@ -56,7 +58,6 @@ module.exports = {
 			return interactionReply(interaction, { type: 4, embeds: embed });
 		}
 		else {
-			const channel = await Bot.channels.fetch(config.home_channel);
 			infoEmbed1.setDescription(`Current home channel: **${channel.name}**`);
 			return interactionReply(interaction, { type: 4, embeds: infoEmbed1 });
 		}

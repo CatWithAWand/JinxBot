@@ -76,8 +76,8 @@ module.exports = {
 					}
 				}
 			}
-			catch (error) {
-				console.log(error);
+			catch (err) {
+				console.error(err);
 				return interactionReply(interaction, { type: 4, content: `There was an error while trying to disconnect!`, flags: 1 << 6, audio: `speech/synthesis_audios/error_disconnect.ogg` });
 			}
 		}

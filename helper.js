@@ -10,7 +10,7 @@ module.exports = {
 			if (reply.dm != null && reply.dm === true) {
 				await Bot.users.fetch(interaction.member.user.id)
 					.then((user) => user.send(reply.embeds))
-					.catch((err) => console.error(err));
+					.catch((error) => console.error(error));
 			}
 			else {
 				return await Bot.api.interactions(interaction.id, interaction.token).callback.post({ data: {
@@ -25,7 +25,7 @@ module.exports = {
 			}
 		}
 		else if (interaction.constructor.name === `Message`) {
-			return await interaction.reply((reply.content != null) ? reply.content : [reply.embeds]);
+			return interaction.reply((reply.content != null) ? reply.content : [reply.embeds]);
 		}
 		else if (interaction.constructor.name === `VoiceConnection`) {
 			if (reply.audio != null) {
@@ -54,7 +54,7 @@ module.exports = {
 				const role = guild.roles.highest;
 				color = role.hexColor;
 			})
-			.catch((err) => console.error(err));
+			.catch((error) => console.error(error));
 		return new Discord.MessageEmbed()
 			.setColor(color)
 			.setThumbnail();

@@ -47,7 +47,6 @@ async function silenceDetection(connection, audioData, sum, user) {
 	// Counter to execute timeout only 8 times = 2000ms
 	userDetection[user].counter = 0;
 	userDetection[user].buffer = Buffer.concat([userDetection[user].buffer, audioData]);
-	console.log(userDetection[user].buffer.length);
 	if (userDetection[user].buffer.length >= 192000) {
 		postToWitAi(userDetection[user].buffer, user);
 		userDetection[user].buffer = Buffer.alloc(0);
@@ -60,7 +59,6 @@ async function silenceDetection(connection, audioData, sum, user) {
 		if (userDetection[user].counter === 8) {
 			clearInterval(timeout);
 			interactionReply(connection, { audio: `resources/sound-effects/activation.ogg` });
-			console.log(`Posting user: ${user.username}`);
 			await postToWitAi(connection, userDetection[user].buffer);
 			userDetection[user].detected = false;
 			guildsServicing[userDetection[user].guild] = false;

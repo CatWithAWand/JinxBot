@@ -49,7 +49,7 @@ module.exports = {
 			errorEmbed1.setTitle(`Failed to reloaded!`);
 			errorEmbed1.setDescription(`There was an error while reloading slash command **${command.name}**`);
 			errorEmbed1.addField(`Error`, err.message.toString(), false);
-			return interactionReply(interaction, {type: 4, embeds: errorEmbed1 });
+			return interactionReply(interaction, { type: 4, embeds: errorEmbed1 });
 		}
 	},
 };

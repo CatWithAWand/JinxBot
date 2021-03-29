@@ -47,8 +47,11 @@ Bot.once(`ready`, async () => {
 // On guild join listener
 Bot.on(`guildCreate`, async (guild) => {
 	// Set custom server nickname
-	const botMember = (await guild.members.fetch()).filter(member => member.id === Bot.user.id).first();
-	botMember.setNickname(`[TLS]⛧Jinx ⛧`);
+	await guild.members.fetch(Bot.user.id)
+		.then((botMember) => {
+			botMember.setNickname(`[TLS]⛧Jinx ⛧`);
+		})
+		.catch((error) => console.error(error));
 	// Find first text channel with SEND_MESSAGES permission for @everyone
 	const firstChannel = guild.channels.cache.filter(channel => channel.type === `text` && channel.permissionsFor(guild.roles.everyone.id).has(`SEND_MESSAGES`) === true).find(c => c.position === 0);
 	const error = new Discord.Collection();

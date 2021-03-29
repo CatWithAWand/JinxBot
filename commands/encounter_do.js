@@ -1,12 +1,13 @@
+const importFresh = require(`import-fresh`);
 const { interactionReply } = require(`../helper.js`);
 const speechSynthesis = require(`../speech/speechSynthesis.js`);
-const config = require(`../config.json`);
 
 module.exports = {
 	name: `encounter_do`,
 	intentID: `455020982579355`,
 	async execute(interaction, data) {
 		const { Bot } = require(`../server.js`);
+		const config = importFresh(`../config.json`);
 		let video = ``;
 		let response = ``;
 
@@ -23,7 +24,7 @@ module.exports = {
 		}
 
 		if (interaction.constructor.name === `VoiceConnection`) {
-			const replyChannel = await Bot.channels.fetch(config.home_channel);
+			const replyChannel = Bot.channels.cache.get(config.home_channel);
 			const audio = await speechSynthesis.execute(response);
 			interactionReply(interaction, { audio: audio });
 			return replyChannel.send(video);

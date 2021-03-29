@@ -55,7 +55,6 @@ module.exports = {
 				const data = JSON.parse(fs.readFileSync(`config.json`));
 				const prev_value = data.speech_rate;
 				const new_value = (value > 0) ? `+${value}` : `${value}`;
-				console.log(value);
 				data.speech_rate = new_value;
 				fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
 				embed = successEmbed1.setDescription(`Successfully changed speech rate value from **${prev_value}** to **${new_value}**.`);

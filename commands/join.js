@@ -37,11 +37,9 @@ module.exports = {
 			}
 			try {
 				const voiceConnection = await member.voice.channel.join();
-				console.log(`creating`);
 				voiceConnection.channel.members.forEach((mbr) => {
 					voiceComprehension.initiate(voiceConnection, mbr.user, mbr.guild.id);
 				});
-				console.log(`next`);
 				if (config.interaction_source) {
 					successEmbed1.setDescription(`Connected to **${voiceConnection.channel.name}** successfully.`);
 					return interactionReply(interaction, { type: 4, embeds: successEmbed1 });

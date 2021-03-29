@@ -59,11 +59,11 @@ module.exports = {
 	name: `speechSynthesis`,
 	description: ``,
 	execute: (text) => {
-		const audio = synthesize(text).catch((err) => {
-			if (err.message === `reached_quota_limit`) {
+		const audio = synthesize(text).catch((error) => {
+			if (error.message === `reached_quota_limit`) {
 				return `speech/synthesis_audios/error_quota_limit.ogg`;
 			}
-			console.error(err);
+			console.error(error);
 			return `speech/synthesis_audios/error_speech_synthesis.ogg`;
 		});
 		return audio;

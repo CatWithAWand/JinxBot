@@ -6,6 +6,7 @@ module.exports = {
 	options: [
 	],
 	usage: `/test`,
+	devOnly: true,
 	async execute(interaction) {
 		const { Bot } = require(`../server.js`);
 		let temp = ``;
