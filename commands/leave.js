@@ -18,14 +18,11 @@ module.exports = {
 		let member = {};
 		switch (interaction.constructor.name) {
 		case `Object`:
-			Bot.guilds.cache.get(interaction.guild_id)
-				.then(async (guild) => {
-					await guild.members.fetch(interaction.member.user.id)
-						.then((mbr) => {
-							member = mbr;
-						})
-						.catch((error) => console.error(error));
-				});
+			await Bot.guilds.cache.get(interaction.guild_id).members.fetch(interaction.member.user.id)
+				.then((mbr) => {
+					member = mbr;
+				})
+				.catch((error) => console.error(error));
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild_id);
 			break;
 		case `Message`:
