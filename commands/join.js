@@ -23,7 +23,7 @@ module.exports = {
 				.catch((error) => console.error(error));
 			break;
 		case `Message`:
-			member = interaction.member;
+			member = interaction.voice.member;
 			break;
 		default:
 			return;

@@ -30,7 +30,7 @@ module.exports = {
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild.id);
 			break;
 		case `VoiceConnection`:
-			member = interaction.member;
+			member = interaction.voice.member;
 			voiceConnection = interaction;
 			break;
 		default:
