@@ -2,6 +2,7 @@ const fs = require(`fs`);
 const Discord = require(`discord.js`);
 const config = require(`./config.json`);
 const Schedule = require(`node-schedule`);
+const Express = require(`express`);
 const { Wit, log } = require(`node-wit`);
 const voiceComprehension = require(`./speech/voiceComprehension`);
 // const qna = require(`./tensorflow/qna.js`);
@@ -11,6 +12,10 @@ const { interactionReply, errorEmbed } = require(`./helper.js`);
 const myIntents = new Discord.Intents();
 myIntents.add(Discord.Intents.ALL);
 const Bot = new Discord.Client({ intents: myIntents, ws: { intents: myIntents } });
+
+// Express
+const App = Express();
+App.use(Express.json());
 
 // WitAI
 const WitAI = new Wit({
@@ -36,6 +41,23 @@ for (const file of commandFiles) {
 const botActivity = Schedule.scheduleJob(`*/10 * * * *`, function() {
 	Bot.user.setActivity(activities[Math.floor(Math.random() * activities.length)].toString(), { type: `PLAYING` });
 });
+
+// Router - App endpoints
+App.post(`/:event`, async (req, res) => {
+	if (req.params.event === `send`) {
+		const data = req.body;
+		Bot.channels.fetch(data.channelID)
+			.then((channel) => channel.send(data.message));
+		return res.sendStatus(200);
+	}
+	else if (req.params.event === `test`) {
+		Bot.channels.fetch(`809417833380708385`)
+			.then((channel) => channel.send(`Test`));
+		return res.sendStatus(200);
+	}
+	res.sendStatus(403);
+});
+
 
 // On bot ready listener
 Bot.once(`ready`, async () => {
@@ -218,6 +240,9 @@ Bot.on(`voiceStateUpdate`, async (oldState, newState) => {
 
 // Login bot
 Bot.login(config.token);
+
+// Initiate server to listen on port 3000
+App.listen(3000, () => console.log(`App endpoints listening on port 3000`));
 
 module.exports = {
 	Bot: Bot,
