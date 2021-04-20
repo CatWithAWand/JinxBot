@@ -1,6 +1,5 @@
-const importFresh = require(`import-fresh`);
 const fs = require(`fs`);
-const { interactionReply, successEmbed, errorEmbed, infoEmbed } = require(`../helper.js`);
+const { interactionReply, successEmbed, errorEmbed, infoEmbed, reloadCfg } = require(`../helper.js`);
 
 module.exports = {
 	name: `pitch`,
@@ -35,11 +34,10 @@ module.exports = {
 	],
 	usage: `/pitch set value: +6`,
 	async execute(interaction) {
-		const { Bot } = require(`../server.js`);
-		const config = importFresh(`../config.json`);
+		const { Bot: { config } } = require(`../server.js`);
 		const successEmbed1 = successEmbed();
-		const infoEmbed1 = infoEmbed();
 		const errorEmbed1 = errorEmbed();
+		const infoEmbed1 = infoEmbed();
 
 		if (!config.moderators.includes(`${interaction.member.user.id}`)) {
 			return interactionReply(interaction, { type: 4, content: `You cannot execute this command! It's only for my moderators.`, flags: 1 << 6 });
@@ -57,6 +55,7 @@ module.exports = {
 				const new_value = (value > 0) ? `+${value}` : `${value}`;
 				data.speech_pitch = new_value;
 				fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+				reloadCfg();
 				embed = successEmbed1.setDescription(`Successfully changed speech pitch value from **${prev_value}** to **${new_value}**.`);
 			}
 			catch (err) {
@@ -75,6 +74,7 @@ module.exports = {
 				const data = JSON.parse(fs.readFileSync(`config.json`));
 				data.speech_pitch = `0`;
 				fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+				reloadCfg();
 				embed = successEmbed1.setDescription(`Successfully reset speech pitch value to **0**.`);
 			}
 			catch (err) {

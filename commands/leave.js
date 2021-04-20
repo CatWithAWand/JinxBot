@@ -1,7 +1,6 @@
 const { interactionReply, successEmbed } = require(`../helper.js`);
 const speechSynthesis = require(`../speech/speechSynthesis.js`);
 const voiceComprehension = require(`../speech/voiceComprehension.js`);
-const config = require(`../config.json`);
 const fs = require(`fs`);
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
 	usage: `/leave`,
 	intentID: `269279977976507`,
 	async execute(interaction) {
-		const { Bot } = require(`../server.js`);
+		const { Bot, Bot: { config } } = require(`../server.js`);
 		const successEmbed1 = successEmbed();
 		let voiceConnection = {};
 		let member = {};
@@ -22,7 +21,7 @@ module.exports = {
 				.then((mbr) => {
 					member = mbr;
 				})
-				.catch((error) => console.error(error));
+				.catch(console.error);
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild_id);
 			break;
 		case `Message`:
@@ -48,21 +47,27 @@ module.exports = {
 					const dispatcher = voiceConnection.play(audio);
 					dispatcher.on(`finish`, () => {
 						dispatcher.destroy();
+						/* This is handle through voiceStateUpdate
 						voiceConnection.channel.members.forEach((mbr) => {
 							voiceComprehension.destroy(mbr.user);
 						});
+						*/
 						voiceConnection.disconnect();
 						fs.unlink(audio, function(err) {
-							if (err) throw err;
+							if (err) {
+								return console.error(err);
+							}
 						});
 						return;
 					});
 					dispatcher.on(`error`, console.error);
 				}
 				else {
+					/* This is handle through voiceStateUpdate
 					voiceConnection.channel.members.forEach((mbr) => {
 						voiceComprehension.destroy(mbr.user);
 					});
+					*/
 					voiceConnection.disconnect();
 					if (config.interaction_source) {
 						successEmbed1.setDescription(`Disconnected from **${voiceConnection.channel.name}** successfully.`);

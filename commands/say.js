@@ -28,7 +28,7 @@ module.exports = {
 				.then((mbr) => {
 					member = mbr;
 				})
-				.catch((error) => console.error(error));
+				.catch(console.error);
 			voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === interaction.guild_id);
 			text = interaction.data.options[0].value;
 			break;

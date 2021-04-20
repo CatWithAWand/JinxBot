@@ -1,31 +1,16 @@
 const fs = require(`fs`);
-const Discord = require(`discord.js`);
-const config = require(`./config.json`);
+const Discord = require(`discord.js`); 
 const Schedule = require(`node-schedule`);
 const Express = require(`express`);
 const { Wit, log } = require(`node-wit`);
 const voiceComprehension = require(`./speech/voiceComprehension`);
-// const qna = require(`./tensorflow/qna.js`);
-const { interactionReply, errorEmbed } = require(`./helper.js`);
+// const qna = require(`./tensorflow/qna`);
+const { interactionReply, errorEmbed } = require(`./helper`);
 
 // Discord bot
 const myIntents = new Discord.Intents();
 myIntents.add(Discord.Intents.ALL);
 const Bot = new Discord.Client({ intents: myIntents, ws: { intents: myIntents } });
-
-// Express
-const App = Express();
-App.use(Express.json());
-
-// WitAI
-const WitAI = new Wit({
-	accessToken: config.witai_token,
-	logger: new log.Logger(log.DEBUG),
-});
-
-// Other constants
-const activities = config.activities;
-Bot.connUsers = new Discord.Collection();
 
 // Load commands
 Bot.commands = new Discord.Collection();
@@ -36,11 +21,39 @@ for (const file of commandFiles) {
 	Bot.commands.set(command.name, command);
 }
 
+// Load config
+Bot.config = require(`./config.json`);
+
+// Express
+const App = Express();
+App.use(Express.json());
+
+// WitAI
+const WitAI = new Wit({
+	accessToken: Bot.config.witai_token,
+	logger: new log.Logger(log.DEBUG),
+});
+
+// Other constants
+const activities = Bot.config.activities;
+Bot.connUsers = new Discord.Collection();
+
 // Schedule jobs
 // eslint-disable-next-line no-unused-vars
 const botActivity = Schedule.scheduleJob(`*/10 * * * *`, function() {
 	Bot.user.setActivity(activities[Math.floor(Math.random() * activities.length)].toString(), { type: `PLAYING` });
 });
+// eslint-disable-next-line no-unused-vars
+const speechStatusReset = Schedule.scheduleJob(`0 2 13 * *`, function() {
+	// Configh speech_quota_usage
+	const data = JSON.parse(fs.readFileSync(`config.json`));
+	data.speech_quota_usage = 0;
+	fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+
+	// Wake word ppn
+
+});
+
 
 // Router - App endpoints
 App.post(`/:event`, async (req, res) => {
@@ -73,7 +86,7 @@ Bot.on(`guildCreate`, async (guild) => {
 		.then((botMember) => {
 			botMember.setNickname(`[TLS]⛧Jinx ⛧`);
 		})
-		.catch((error) => console.error(error));
+		.catch(console.error);
 	// Find first text channel with SEND_MESSAGES permission for @everyone
 	const firstChannel = guild.channels.cache.filter(channel => channel.type === `text` && channel.permissionsFor(guild.roles.everyone.id).has(`SEND_MESSAGES`) === true).find(c => c.position === 0);
 	const error = new Discord.Collection();
@@ -103,9 +116,7 @@ Bot.on(`guildCreate`, async (guild) => {
 			}
 		});
 	});
-	promise.catch((err) => {
-		console.error(err);
-	});
+	promise.catch(console.error);
 	promise.then(() => {
 		if (!(error.size === 0)) {
 			error.forEach((command) => {
@@ -125,14 +136,15 @@ Bot.on(`message`, async (message) => {
 
 		// Remove bot mention
 		const msg = message.content.replace(`<@!${Bot.user.id}>`, ``);
+
 		// WitAI api call
 		await WitAI.message(msg, {}).then(async (data) => {
-			const command = Bot.commands.find(cmd => cmd.intentID === data.intents[0].id);
+			const command = Bot.commands.find(cmd => cmd.intentID === (data.intents?.[0]?.id ?? 0));
 
-			if(!command) return;
+			if(!command) return message.reply(Bot.config.intent_response.no_intent[Math.floor(Math.random() * Bot.config.intent_response.not_using_elite.length)].toString());
 
 			command.execute(message, data);
-		}).catch((err) => console.error(err));
+		}).catch(console.error);
 
 	}
 	catch(err) {
@@ -148,20 +160,17 @@ Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
 		// Permissions check
 		if (command.permissions) {
 			const perms = new Discord.Permissions((interaction.member.permissions - 2147483648));
-			if (!perms || !perms.has(command.permissions)) {
+			if (!perms || !perms.has(command.permissions))
 				return interactionReply(interaction, 4, `You do not have the right permissions for this command! (Requires: ${command.permissions})`, null, 1 << 6);
-			}
 		}
 
 		// Dev only check
-		if (command.devOnly && !(interaction.member.user.id === `107697492509888512`)) {
+		if (command.devOnly && !(interaction.member.user.id === `107697492509888512`))
 			return interactionReply(interaction, 4, `Sorry, this is a developer only command!`, null, 1 << 6);
-		}
 
 		// Check if command has a collection
-		if (!cooldowns.has(command.name)) {
+		if (!cooldowns.has(command.name))
 			cooldowns.set(command.name, new Discord.Collection());
-		}
 
 		const now = Date.now();
 		const timestamps = cooldowns.get(command.name);
@@ -199,39 +208,42 @@ Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
 // This is used to initiate/destroy voice comprehension handlers dynamically
 Bot.on(`voiceStateUpdate`, async (oldState, newState) => {
 	// Ignore bot's voiceStateUpdate states
-	if (newState.id === Bot.user.id) return;
 
-	if (oldState.channelID == null) {
+	if ((oldState.channelID == null) && (newState.id !== Bot.user.id)) {
 		// Connected to a voice channel
 		if (Bot.connUsers.get(newState.id)) return;
 		// If the user already exists in the collection, user is already initiated
 		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
-		if (voiceConnection) {
-			if (voiceConnection.channel.members.has(newState.id)) {
-				// member is part of connection
-				await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
-				// Initiate and create handlers for the user
-			}
-		}
+		if (voiceConnection && voiceConnection.channel.members.has(newState.id)) 
+			// member is part of connection
+			return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+			// Initiate and create handlers for the user
 	}
 	else if (newState.channelID == null) {
 		// Disconnected from a voice channel
+		if (newState.id === Bot.user.id) {
+			// If bot was force disconnected
+			oldState.channel.members.forEach(async (member) => {
+				await voiceComprehension.destroy(member.user);
+			});
+			return;
+		}
 		if (!Bot.connUsers.get(oldState.id)) return;
 		// If the user exists in the collection, user has handlers
-		await voiceComprehension.destroy(oldState.member.user);
+		return await voiceComprehension.destroy(oldState.member.user);
 		// Destroy user's handlers
 	}
-	else if (newState.channelID != oldState.channelID) {
+	else if ((newState.channelID != oldState.channelID) && (newState.id !== Bot.user.id)) {
 		// Changed voice channel
 		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
 		if (voiceConnection) {
 			if (oldState.channelID === voiceConnection.channel.id) {
 				// User has left the connection channel
-				await voiceComprehension.destroy(oldState.member.user);
+				return await voiceComprehension.destroy(oldState.member.user);
 			}
 			else if (newState.channelID === voiceConnection.channel.id) {
 				// User has joined the connection channel
-				await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+				return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
 			}
 		}
 	}
@@ -239,11 +251,20 @@ Bot.on(`voiceStateUpdate`, async (oldState, newState) => {
 });
 
 // Login bot
-Bot.login(config.token);
+Bot.login(Bot.config.token);
 
 // Initiate server to listen on port 3000
 App.listen(3000, () => console.log(`App endpoints listening on port 3000`));
 
+// Lazy things
+process.on(`uncaughtException`, function(err) {
+	console.log('Caught Exception: ' + err);
+});
+process.on(`unhandledRejection`, function(err) {
+	console.log('Caught Rejection: ' + err);
+});
+
 module.exports = {
 	Bot: Bot,
+	Config: Bot.config,
 };

@@ -7,6 +7,8 @@
 	"parserOptions": {
 		"ecmaVersion": 2019
 	},
+	"parser": "@babel/eslint-parser",
+	"requireConfigFile": false,
 	"rules": {
 		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
 		"comma-dangle": ["error", "always-multiline"],

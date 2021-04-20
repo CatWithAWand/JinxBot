@@ -4,8 +4,8 @@ const Porcupine = require(`@picovoice/porcupine-node`);
 // const fs = require(`fs`);
 const axios = require(`axios`);
 // const FormData = require(`form-data`);
-const config = require(`../config.json`);
 const { interactionReply } = require(`../helper.js`);
+const speechSynthesis = require(`../speech/speechSynthesis.js`);
 
 const userHandlers = {};
 const userStreams = {};
@@ -17,7 +17,7 @@ const guildsServicing = {};
 let timeout = null;
 
 function postToWitAi(connection, audioData) {
-	const { Bot } = require(`../server.js`);
+	const { Bot, Bot: { config } } = require(`../server.js`);
 	// const formData = new FormData();
 	// formData.append(`file`, audioData, { knownLength: audioData.length });
 	const axios_witaispeech = {
@@ -30,17 +30,18 @@ function postToWitAi(connection, audioData) {
 		// ...formData.getHeaders(),
 	};
 	axios.post(`https://api.wit.ai/speech`, audioData, axios_witaispeech)
-		.then((response) => {
+		.then(async (response) => {
 			console.log(response.data);
-			const command = Bot.commands.find(cmd => cmd.intentID === response.data.intents[0].id);
+			const command = Bot.commands.find(cmd => cmd.intentID === (response.data.intents?.[0]?.id ?? 0));
 
-			if(!command) return;
+			if(!command) {
+				const audio = await speechSynthesis.execute(config.intent_response.no_intent[Math.floor(Math.random() * config.intent_response.not_using_elite.length)].toString());
+				return interactionReply(connection, { audio: audio });
+			};
 
 			command.execute(connection, response.data);
 		})
-		.catch((error) => {
-			console.error(error);
-		});
+		.catch(console.error);
 }
 
 async function silenceDetection(connection, audioData, sum, user) {
@@ -74,7 +75,7 @@ function chunkArray(array, size) {
 }
 
 function initiate(connection, user, guildID) {
-	const { Bot } = require(`../server.js`);
+	const { Bot, Bot: { config } } = require(`../server.js`);
 
 	// If user is the Bot then return
 	if (user.id === Bot.user.id) return;
@@ -87,7 +88,7 @@ function initiate(connection, user, guildID) {
 	// TODO: Add a check in case of multiple user join initiations and wake interactions!!!!!!!!!!!
 	// TODO: Update Handlers for newly joined members
 	userDetection[user] = { detected: false, buffer: Buffer.alloc(0), counter: 0, guild: guildID };
-	userHandlers[user] = new Porcupine([`speech/wake_word/hey_jinx_linux_2021-04-13-utc_v1_9_0.ppn`], [0.5]);
+	userHandlers[user] = new Porcupine([`speech/wake_word/${config.wake_word}`], [0.5]);
 	const frameLength = userHandlers[user].frameLength;
 	userStreams[user] = receiver.createStream(user, { mode: `opus`, end: `manual` });
 	userDecoders[user] = new Prism.opus.Decoder({ frameSize: 640, channels: 1, rate: 16000 });

@@ -1,5 +1,6 @@
 const Discord = require(`discord.js`);
 const fs = require(`fs`);
+const importFresh = require(`import-fresh`);
 
 module.exports = {
 	// Interaction response, flags: 1 << 6 make the reply ephemeral
@@ -10,7 +11,7 @@ module.exports = {
 			if (reply.dm != null && reply.dm === true) {
 				await Bot.users.fetch(interaction.member.user.id)
 					.then((user) => user.send(reply.embeds))
-					.catch((error) => console.error(error));
+					.catch(console.error);
 			}
 			else {
 				return await Bot.api.interactions(interaction.id, interaction.token).callback.post({ data: {
@@ -21,7 +22,7 @@ module.exports = {
 					},
 				},
 				})
-					.catch((err) => console.error(err));
+					.catch(console.error);
 			}
 		}
 		else if (interaction.constructor.name === `Message`) {
@@ -34,7 +35,9 @@ module.exports = {
 					dispatcher.on(`finish`, () => {
 						if(/\/([0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\./i.test(reply.audio)) {
 							fs.unlink(reply.audio, function(err) {
-								if (err) throw err;
+								if (err) {
+									return console.error(err);
+								}
 							});
 						}
 						dispatcher.destroy();
@@ -48,13 +51,7 @@ module.exports = {
 	},
 	rolecolorEmbed: async (guildID) => {
 		const { Bot } = require(`./server.js`);
-		let color = `#2196f3`;
-		await Bot.guilds.cache.get(guildID)
-			.then((guild) => {
-				const role = guild.roles.highest;
-				color = role.hexColor;
-			})
-			.catch((error) => console.error(error));
+		const color = Bot.guilds.cache.get(guildID).members.cache.get(Bot.user.id).displayHexColor ?? `#2196f3`;
 		return new Discord.MessageEmbed()
 			.setColor(color)
 			.setThumbnail();
@@ -88,4 +85,8 @@ module.exports = {
 			.setColor(`#f44336`)
 			.setThumbnail();
 	},
+	reloadCfg: () => {
+		const { Bot } = require(`./server.js`);
+		Bot.config = importFresh(`./config.json`);
+	}
 };

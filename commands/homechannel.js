@@ -1,6 +1,6 @@
 const importFresh = require(`import-fresh`);
 const fs = require(`fs`);
-const { interactionReply, successEmbed, errorEmbed, infoEmbed } = require(`../helper.js`);
+const { interactionReply, successEmbed, errorEmbed, infoEmbed, reloadCfg } = require(`../helper.js`);
 
 module.exports = {
 	name: `homechannel`,
@@ -29,8 +29,7 @@ module.exports = {
 	],
 	usage: `/homechannel set channel: #mybotschannel`,
 	async execute(interaction) {
-		const { Bot } = require(`../server.js`);
-		const config = importFresh(`../config.json`);
+		const { Bot, Bot: { config } } = require(`../server.js`);
 		const successEmbed1 = successEmbed();
 		const infoEmbed1 = infoEmbed();
 		const errorEmbed1 = errorEmbed();
@@ -42,13 +41,14 @@ module.exports = {
 		let channel = null;
 		await Bot.channels.fetch(channelID)
 			.then((chnl) => channel = chnl)
-			.catch((error) => console.error(error));
+			.catch(console.error);
 		if (interaction.data.options[0].name === `set`) {
 			let embed = null;
 			try {
 				const data = JSON.parse(fs.readFileSync(`config.json`));
 				data.home_channel = channel.id;
 				fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+				reloadCfg();
 				embed = successEmbed1.setDescription(`Successfully set **${channel.name}** as new home channel.`);
 			}
 			catch (err) {

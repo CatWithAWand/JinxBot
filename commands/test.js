@@ -8,13 +8,7 @@ module.exports = {
 	usage: `/test`,
 	devOnly: true,
 	async execute(interaction) {
-		const { Bot } = require(`../server.js`);
-		let temp = ``;
-		Bot.commands.forEach((command) => {
-			if (command.options) {
-				temp += command.name;
-			}
-		});
-		interactionReply(interaction, { type: 4, content: temp });
+		const { Bot: { config } } = require(`../server.js`);
+		return interactionReply(interaction, { type: 4, content: config.wake_word });
 	},
 };

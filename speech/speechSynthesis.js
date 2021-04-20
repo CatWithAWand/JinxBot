@@ -3,7 +3,7 @@ const uuid4 = require(`uuid4`);
 const { AudioConfig } = require(`microsoft-cognitiveservices-speech-sdk`);
 const sdk = require(`microsoft-cognitiveservices-speech-sdk`);
 const speechConfig = sdk.SpeechConfig.fromSubscription(`842b3f8bbec6454aa752414950c3d000`, `westeurope`);
-const importFresh = require(`import-fresh`);
+const { reloadCfg } = require(`../helper.js`);
 
 /*
 async function xmlToString(filePath) {
@@ -16,11 +16,12 @@ async function updateJson(num) {
 	const data = JSON.parse(fs.readFileSync(`config.json`));
 	data.speech_quota_usage += num;
 	fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+	reloadCfg();
 }
 
 function synthesize(text) {
 	return new Promise(function(resolve, reject) {
-		const config = importFresh(`../config.json`);
+		const { Bot: { config } } = require(`../server.js`);
 		if ((config.speech_quota_usage + text.length) >= 450000) {
 			return reject(new Error(`reached_quota_limit`));
 		}
@@ -59,11 +60,11 @@ module.exports = {
 	name: `speechSynthesis`,
 	description: ``,
 	execute: (text) => {
-		const audio = synthesize(text).catch((error) => {
+		const audio = synthesize(text).catch((err) => {
 			if (error.message === `reached_quota_limit`) {
 				return `speech/synthesis_audios/error_quota_limit.ogg`;
 			}
-			console.error(error);
+			console.error(err);
 			return `speech/synthesis_audios/error_speech_synthesis.ogg`;
 		});
 		return audio;

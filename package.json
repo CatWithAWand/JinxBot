@@ -21,10 +21,11 @@
   "author": "0xPain",
   "license": "ISC",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/arissait/JinxBot/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/arissait/JinxBot",
   "dependencies": {
+    "@babel/eslint-parser": "^7.13.14",
     "@discordjs/opus": "^0.5.0",
     "@picovoice/porcupine-node": "^1.9.0",
     "@tensorflow-models/qna": "^1.0.0",
@@ -42,6 +43,7 @@
     "node-schedule": "^2.0.0",
     "node-wit": "^6.0.1",
     "prism-media": "^1.2.9",
+    "request": "^2.88.2",
     "uuid4": "^2.0.2"
   }
 }

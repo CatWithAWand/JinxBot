@@ -1,5 +1,4 @@
 const { interactionReply, successEmbed } = require(`../helper.js`);
-const config = require(`../config.json`);
 const voiceComprehension = require(`../speech/voiceComprehension.js`);
 
 
@@ -11,7 +10,7 @@ module.exports = {
 	usage: `/join`,
 	intentID: `146847057319884`,
 	async execute(interaction) {
-		const { Bot } = require(`../server.js`);
+		const { Bot, Bot: { config } } = require(`../server.js`);
 		const successEmbed1 = successEmbed();
 		let member = {};
 		switch (interaction.constructor.name) {
@@ -20,7 +19,7 @@ module.exports = {
 				.then((mbr) => {
 					member = mbr;
 				})
-				.catch((error) => console.error(error));
+				.catch(console.error);
 			break;
 		case `Message`:
 			member = interaction.voice.member;
