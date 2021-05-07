@@ -1,7 +1,7 @@
 {
     "permissions": "2818571840",
     "invite_link": "https://discord.com/api/oauth2/authorize?client_id=820729352793620520&permissions=2818571840&scope=bot%20applications.commands",
-    "token": "ODI0NTkyNDExODgyOTQ2NjAw.YFxnhw.8YWn0e4ypW6FWAI3yhlFuAG1loU",
+    "token": "ODIwNzI5MzUyNzkzNjIwNTIw.YE5Zxg.6pQuFZq46asVDi_V8OIBaS0nvwY",
     "witai_token": "ERKJEZSPN6QUZKZJ3FPVWUO2PPSHUS2Z",
     "cognitiveservices_speech_key": "842b3f8bbec6454aa752414950c3d000",
     "moderators": [
@@ -9,7 +9,7 @@
         "670259907022553100"
     ],
     "source_ephemeral": false,
-    "home_channel": "809417833380708385",
+    "home_channel": "807398872514822194",
     "context": "context_compact",
     "wake_word": "hey_jinx_linux_2021-05-20-utc_v1_9_0.ppn",
     "speech_lang": "en-IN",
