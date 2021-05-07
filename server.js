@@ -265,12 +265,12 @@ Bot.login(Bot.config.token);
 App.listen(3000, () => console.log(`App endpoints listening on port 3000`));
 
 // Lazy things
-// process.on(`uncaughtException`, function(err) {
-//   console.log(`Caught Exception: ` + err);
-// });
-// process.on(`unhandledRejection`, function(err) {
-//   console.log(`Caught Rejection: ` + err);
-// });
+process.on(`uncaughtException`, function(err) {
+  console.log(`Caught Exception: ` + err);
+});
+process.on(`unhandledRejection`, function(err) {
+  console.log(`Caught Rejection: ` + err);
+});
 
 module.exports = {
   Bot: Bot,
