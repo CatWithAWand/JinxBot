@@ -1,16 +1,16 @@
-const { interactionReply } = require(`../helper.js`);
-const speechSynthesis = require(`../speech/speechSynthesis.js`);
+const { reply } = require(`../utils/reply`);
+const speechSynthesis = require(`../speech/speechSynthesis`);
 
 module.exports = {
-	name: `buy_raids`,
-	intentID: `1581202865419297`,
-	async execute(interaction) {
-		const { Bot: { config } } = require(`../server.js`);
-		let audio = ``;
-		const response = config.intent_response.buy_raids[Math.floor(Math.random() * config.intent_response.buy_raids.length)].toString();
-		if (interaction.constructor.name === `VoiceConnection`) {
-			audio = await speechSynthesis.execute(response);
-		}
-		interactionReply(interaction, { content: response, audio: audio });
-	},
+  name: `buy_raids`,
+  intentID: `1581202865419297`,
+  async execute(interaction) {
+    const { Bot: { config } } = require(`../server`);
+    let audio = ``;
+    const response = config.intent_response.buy_raids[Math.floor(Math.random() * config.intent_response.buy_raids.length)].toString();
+    if (interaction.constructor.name === `VoiceConnection`) {
+      audio = await speechSynthesis.execute(response);
+    }
+    reply(interaction, { content: response, audio: audio });
+  },
 };

@@ -1,11 +1,13 @@
 const fs = require(`fs`);
-const Discord = require(`discord.js`); 
+const Discord = require(`discord.js`);
 const Schedule = require(`node-schedule`);
 const Express = require(`express`);
 const { Wit, log } = require(`node-wit`);
+const { checkToxicity } = require(`./utils/helper`);
+const { errorEmbed } = require(`./utils/embeds`);
+const { reply } = require(`./utils/reply`);
 const voiceComprehension = require(`./speech/voiceComprehension`);
 // const qna = require(`./tensorflow/qna`);
-const { interactionReply, errorEmbed } = require(`./helper`);
 
 // Discord bot
 const myIntents = new Discord.Intents();
@@ -17,8 +19,8 @@ Bot.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
 const commandFiles = fs.readdirSync(`./commands`).filter(file => file.endsWith(`.js`));
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	Bot.commands.set(command.name, command);
+  const command = require(`./commands/${file}`);
+  Bot.commands.set(command.name, command);
 }
 
 // Load config
@@ -30,8 +32,8 @@ App.use(Express.json());
 
 // WitAI
 const WitAI = new Wit({
-	accessToken: Bot.config.witai_token,
-	logger: new log.Logger(log.DEBUG),
+  accessToken: Bot.config.witai_token,
+  logger: new log.Logger(log.DEBUG),
 });
 
 // Other constants
@@ -41,212 +43,218 @@ Bot.connUsers = new Discord.Collection();
 // Schedule jobs
 // eslint-disable-next-line no-unused-vars
 const botActivity = Schedule.scheduleJob(`*/10 * * * *`, function() {
-	Bot.user.setActivity(activities[Math.floor(Math.random() * activities.length)].toString(), { type: `PLAYING` });
+  Bot.user.setActivity(activities[Math.floor(Math.random() * activities.length)].toString(), { type: `PLAYING` });
 });
 // eslint-disable-next-line no-unused-vars
 const speechStatusReset = Schedule.scheduleJob(`0 2 13 * *`, function() {
-	// Configh speech_quota_usage
-	const data = JSON.parse(fs.readFileSync(`config.json`));
-	data.speech_quota_usage = 0;
-	fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
+  // Configh speech_quota_usage
+  const data = JSON.parse(fs.readFileSync(`config.json`));
+  data.speech_quota_usage = 0;
+  fs.writeFileSync(`config.json`, JSON.stringify(data, null, 4));
 
-	// Wake word ppn
+  // Wake word ppn
 
 });
 
 
 // Router - App endpoints
 App.post(`/:event`, async (req, res) => {
-	if (req.params.event === `send`) {
-		const data = req.body;
-		Bot.channels.fetch(data.channelID)
-			.then((channel) => channel.send(data.message));
-		return res.sendStatus(200);
-	}
-	else if (req.params.event === `test`) {
-		Bot.channels.fetch(`809417833380708385`)
-			.then((channel) => channel.send(`Test`));
-		return res.sendStatus(200);
-	}
-	res.sendStatus(403);
+  if (req.params.event === `send`) {
+    const data = req.body;
+    Bot.channels.fetch(data.channelID)
+      .then((channel) => channel.send(data.message)).catch(console.error);
+    return res.sendStatus(200);
+  }
+  else if (req.params.event === `test`) {
+    Bot.channels.fetch(`809417833380708385`)
+      .then((channel) => channel.send(`Test`)).catch(console.error);
+    return res.sendStatus(200);
+  }
+  res.sendStatus(403);
 });
 
 
 // On bot ready listener
 Bot.once(`ready`, async () => {
-	Bot.user.setActivity(`it's Alacrity time`, { type: `PLAYING` });
-	// qna.load();
-	console.log(`Bot is online!`);
+  Bot.user.setActivity(`it's Alacrity time`, { type: `PLAYING` });
+  // qna.load();
+  console.log(`Bot is online!`);
 });
 
 // On guild join listener
 Bot.on(`guildCreate`, async (guild) => {
-	// Set custom server nickname
-	await guild.members.fetch(Bot.user.id)
-		.then((botMember) => {
-			botMember.setNickname(`[TLS]⛧Jinx ⛧`);
-		})
-		.catch(console.error);
-	// Find first text channel with SEND_MESSAGES permission for @everyone
-	const firstChannel = guild.channels.cache.filter(channel => channel.type === `text` && channel.permissionsFor(guild.roles.everyone.id).has(`SEND_MESSAGES`) === true).find(c => c.position === 0);
-	const error = new Discord.Collection();
-	const errorEmbed1 = errorEmbed();
-	errorEmbed1.setDescription(`Hey, I joined but I could not register the following slash commands. Anyway where's TutminatorT92?`);
-	let counter = 0;
-	// Promise due to the codes asynchronous nature
-	// eslint-disable-next-line no-unused-vars
-	const promise = new Promise((resolve, reject) => {
-		Bot.commands.forEach((command) => {
-			if (command.options) {
-				Bot.api.applications(Bot.user.id).guilds(guild.id).commands.post({ data: {
-					name: command.name,
-					description: command.description,
-					options: command.options,
-				} })
-					.catch((err) => {
-						error.set(command.name, { name: command.name, error: err.message, code: err.code.toString() });
-						// console.error(err);
-					})
-					.finally(() => {
-						counter++;
-						if (counter == Bot.commands.size) {
-							resolve();
-						}
-					});
-			}
-		});
-	});
-	promise.catch(console.error);
-	promise.then(() => {
-		if (!(error.size === 0)) {
-			error.forEach((command) => {
-				errorEmbed1.addField(command.name, `Error: ${command.error}, Code: ${command.code}`, false);
-			});
-			return firstChannel.send(errorEmbed1);
-		}
-		firstChannel.send(`Hey, it's me Jinx, I'm looking for TutminatorT92.`);
-	});
+  // Set custom server nickname
+  await guild.members.fetch(Bot.user.id)
+    .then((botMember) => {
+      return botMember.setNickname(`[TLS]⛧Jinx ⛧`);
+    })
+    .catch(console.error);
+  // Find first text channel with SEND_MESSAGES permission for @everyone
+  const firstChannel = guild.channels.cache.filter(channel => channel.type === `text` && channel.permissionsFor(guild.roles.everyone.id).has(`SEND_MESSAGES`) === true).find(c => c.position === 0);
+  const error = new Discord.Collection();
+  const errorEmbed1 = errorEmbed();
+  errorEmbed1.setDescription(`Hey, I joined but I could not register the following slash commands. Anyway where's TutminatorT92?`);
+  const cmds = Bot.commands.filter((cmd) => cmd.options);
+
+  // Promise due to the codes asynchronous nature
+  new Promise((resolve) => {
+    const loop = (i, collection) => {
+      if (i === collection.size) return resolve();
+      const key = Array.from(collection.keys())[i];
+      const command = collection.get(key);
+
+      // 1000ms timeout to respect the API rate limit
+      const timeout = setTimeout(() => {
+        return Bot.api.applications(Bot.user.id).guilds(guild.id).commands.post({ data: {
+          name: command.name,
+          description: command.description,
+          options: command.options,
+        } })
+          .catch((err) => {
+            error.set(command.name, { name: command.name, error: err.message, code: err.code.toString() });
+            console.error(err);
+          })
+          .finally(() => {
+            i++;
+            clearTimeout(timeout);
+            loop(i, collection);
+          });
+      }, 2000);
+    };
+    loop(0, cmds);
+  })
+    .then(() => {
+      if (!(error.size === 0)) {
+        error.forEach((command) => {
+          errorEmbed1.addField(command.name, `Error: ${command.error}, Code: ${command.code}`, false);
+        });
+        return firstChannel.send(errorEmbed1);
+      }
+      return firstChannel.send(`I set up my commands and all. I prayed to the gods of Sand and Air, and I'm ready for TutminatorT92!`);
+    })
+    .catch(console.error);
 });
 
 // On message listener
 Bot.on(`message`, async (message) => {
-	try {
-		// Exit if the author is the bot or the bot is not mentioned
-		if (message.author.bot || !message.mentions.has(Bot.user)) return;
+  try {
+    // Exit if the author is the bot or the bot is not mentioned
+    if (message.author.bot || !message.mentions.has(Bot.user)) return;
 
-		// Remove bot mention
-		const msg = message.content.replace(`<@!${Bot.user.id}>`, ``);
+    // Remove bot mention
+    const msg = message.content.replace(`<@!${Bot.user.id}>`, ``);
 
-		// WitAI api call
-		await WitAI.message(msg, {}).then(async (data) => {
-			const command = Bot.commands.find(cmd => cmd.intentID === (data.intents?.[0]?.id ?? 0));
+    // WitAI api call
+    await WitAI.message(msg, {}).then(async (data) => {
+      const command = Bot.commands.find(cmd => cmd.intentID === (data.intents?.[0]?.id ?? 0));
 
-			if(!command) return message.reply(Bot.config.intent_response.no_intent[Math.floor(Math.random() * Bot.config.intent_response.not_using_elite.length)].toString());
+      if(command) return command.execute(message, data);
 
-			command.execute(message, data);
-		}).catch(console.error);
+      const toxicityReply = await checkToxicity(msg);
+      return message.reply(toxicityReply ?? Bot.config.intent_response.no_intent[Math.floor(Math.random() * Bot.config.intent_response.no_intent.length)].toString());
+    }).catch(console.error);
 
-	}
-	catch(err) {
-		console.error(err);
-	}
+  }
+  catch(err) {
+    console.error(err);
+  }
 });
 
-// On interaction listener
+// On websocket interaction listener
 Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
-	try {
-		const command = Bot.commands.get(interaction.data.name);
+  try {
+    const command = Bot.commands.get(interaction.data.name);
 
-		// Permissions check
-		if (command.permissions) {
-			const perms = new Discord.Permissions((interaction.member.permissions - 2147483648));
-			if (!perms || !perms.has(command.permissions))
-				return interactionReply(interaction, 4, `You do not have the right permissions for this command! (Requires: ${command.permissions})`, null, 1 << 6);
-		}
+    // Permissions check
+    if (command.permissions) {
+      const perms = new Discord.Permissions((interaction.member.permissions - 2147483648));
+      if (!perms || !perms.has(command.permissions)) {return reply(interaction, { type: 4, content: `You do not have the right permissions for this command! (Requires: ${command.permissions})`, flags: 1 << 6 });}
+    }
 
-		// Dev only check
-		if (command.devOnly && !(interaction.member.user.id === `107697492509888512`))
-			return interactionReply(interaction, 4, `Sorry, this is a developer only command!`, null, 1 << 6);
+    // Dev only check
+    if (command.devOnly && !(interaction.member.user.id === `107697492509888512`)) {return reply(interaction, { type: 4, content: `Sorry, this is a developer only command!`, flags: 1 << 6 });}
 
-		// Check if command has a collection
-		if (!cooldowns.has(command.name))
-			cooldowns.set(command.name, new Discord.Collection());
+    // Check if command has a collection
+    if (!cooldowns.has(command.name)) {cooldowns.set(command.name, new Discord.Collection());}
 
-		const now = Date.now();
-		const timestamps = cooldowns.get(command.name);
-		const cooldownAmount = (command.cooldown || 3) * 1000;
+    const now = Date.now();
+    const timestamps = cooldowns.get(command.name);
+    const cooldownAmount = (command.cooldown || 3) * 1000;
 
-		// Check if user is already in timestamps
-		if (timestamps.has(interaction.member.user.id)) {
-			const expirationTime = timestamps.get(interaction.member.user.id) + cooldownAmount;
+    // Check if user is already in timestamps
+    if (timestamps.has(interaction.member.user.id)) {
+      const expirationTime = timestamps.get(interaction.member.user.id) + cooldownAmount;
 
-			// Check time elapsed since the last time the user executed the command
-			if (now < expirationTime) {
-				const timeLeft = (expirationTime - now) / 1000;
-				return interactionReply(interaction, 4, `Please wait ${Math.round(timeLeft)} more second(s) before reusing the '/${command.name}' command, <@${interaction.member.user.id}>`, null, 1 << 6);
-			}
-		}
+      // Check time elapsed since the last time the user executed the command
+      if (now < expirationTime) {
+        const timeLeft = (expirationTime - now) / 1000;
+        return reply(interaction, { type: 4, content: `Please wait ${Math.round(timeLeft)} more second(s) before reusing the '/${command.name}' command, <@${interaction.member.user.id}>`, flags: 1 << 6 });
+      }
+    }
 
-		// Add user to timestamps
-		timestamps.set(interaction.member.user.id, now);
-		setTimeout(() => timestamps.delete(interaction.member.user.id), cooldownAmount);
+    // Add user to timestamps
+    timestamps.set(interaction.member.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.member.user.id), cooldownAmount);
 
-		try {
-			command.execute(interaction);
-		}
-		catch(err) {
-			console.error(err);
-			return interactionReply(interaction, 4, `There was an error trying to execute that command!`, null, 1 << 6);
-		}
-	}
-	catch(err) {
-		console.error(err);
-	}
+    try {
+      command.execute(interaction);
+    }
+    catch(err) {
+      console.error(err);
+      return reply(interaction, { type: 4, content: `There was an error trying to execute that command!`, flags: 1 << 6 });
+    }
+  }
+  catch(err) {
+    console.error(err);
+  }
 });
 
 // On voiceStateUpdate listener
 // This is used to initiate/destroy voice comprehension handlers dynamically
 Bot.on(`voiceStateUpdate`, async (oldState, newState) => {
-	// Ignore bot's voiceStateUpdate states
+  // Ignore bot's voiceStateUpdate states
 
-	if ((oldState.channelID == null) && (newState.id !== Bot.user.id)) {
-		// Connected to a voice channel
-		if (Bot.connUsers.get(newState.id)) return;
-		// If the user already exists in the collection, user is already initiated
-		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
-		if (voiceConnection && voiceConnection.channel.members.has(newState.id)) 
-			// member is part of connection
-			return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
-			// Initiate and create handlers for the user
-	}
-	else if (newState.channelID == null) {
-		// Disconnected from a voice channel
-		if (newState.id === Bot.user.id) {
-			// If bot was force disconnected
-			oldState.channel.members.forEach(async (member) => {
-				await voiceComprehension.destroy(member.user);
-			});
-			return;
-		}
-		if (!Bot.connUsers.get(oldState.id)) return;
-		// If the user exists in the collection, user has handlers
-		return await voiceComprehension.destroy(oldState.member.user);
-		// Destroy user's handlers
-	}
-	else if ((newState.channelID != oldState.channelID) && (newState.id !== Bot.user.id)) {
-		// Changed voice channel
-		const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
-		if (voiceConnection) {
-			if (oldState.channelID === voiceConnection.channel.id) {
-				// User has left the connection channel
-				return await voiceComprehension.destroy(oldState.member.user);
-			}
-			else if (newState.channelID === voiceConnection.channel.id) {
-				// User has joined the connection channel
-				return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
-			}
-		}
-	}
+  if ((oldState.channelID == null) && (newState.id !== Bot.user.id)) {
+    // Connected to a voice channel
+    if (Bot.connUsers.get(newState.id)) return;
+    // If the user already exists in the collection, user is already initiated
+    const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
+
+    if (voiceConnection && voiceConnection.channel.members.has(newState.id)) {
+      // Member is part of connection
+      // Initiate and create handlers for the user
+      return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+    }
+  }
+  else if (newState.channelID == null) {
+    // Disconnected from a voice channel
+    if (newState.id === Bot.user.id) {
+      // If bot was force disconnected
+      oldState.channel.members.forEach(async (member) => {
+        await voiceComprehension.destroy(member.user);
+      });
+      return;
+    }
+    if (!Bot.connUsers.get(oldState.id)) return;
+    // If the user exists in the collection, user has handlers
+    return await voiceComprehension.destroy(oldState.member.user);
+    // Destroy user's handlers
+  }
+  else if ((newState.channelID != oldState.channelID) && (newState.id !== Bot.user.id)) {
+    // Changed voice channel
+    const voiceConnection = Bot.voice.connections.find(connection => connection.channel.guild.id === newState.guild.id);
+
+    if (voiceConnection) {
+      if (oldState.channelID === voiceConnection.channel.id) {
+        // User has left the connection channel
+        return await voiceComprehension.destroy(oldState.member.user);
+      }
+      else if (newState.channelID === voiceConnection.channel.id) {
+        // User has joined the connection channel
+        return await voiceComprehension.initiate(voiceConnection, newState.member.user, newState.guild.id);
+      }
+    }
+  }
 
 });
 
@@ -257,14 +265,14 @@ Bot.login(Bot.config.token);
 App.listen(3000, () => console.log(`App endpoints listening on port 3000`));
 
 // Lazy things
-process.on(`uncaughtException`, function(err) {
-	console.log('Caught Exception: ' + err);
-});
-process.on(`unhandledRejection`, function(err) {
-	console.log('Caught Rejection: ' + err);
-});
+// process.on(`uncaughtException`, function(err) {
+//   console.log(`Caught Exception: ` + err);
+// });
+// process.on(`unhandledRejection`, function(err) {
+//   console.log(`Caught Rejection: ` + err);
+// });
 
 module.exports = {
-	Bot: Bot,
-	Config: Bot.config,
+  Bot: Bot,
+  Config: Bot.config,
 };

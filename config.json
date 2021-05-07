@@ -1,14 +1,22 @@
 {
     "permissions": "2818571840",
     "invite_link": "https://discord.com/api/oauth2/authorize?client_id=820729352793620520&permissions=2818571840&scope=bot%20applications.commands",
-    "token": "ODIwNzI5MzUyNzkzNjIwNTIw.YE5Zxg.6pQuFZq46asVDi_V8OIBaS0nvwY",
+    "token": "ODI0NTkyNDExODgyOTQ2NjAw.YFxnhw.8YWn0e4ypW6FWAI3yhlFuAG1loU",
     "witai_token": "ERKJEZSPN6QUZKZJ3FPVWUO2PPSHUS2Z",
     "cognitiveservices_speech_key": "842b3f8bbec6454aa752414950c3d000",
     "moderators": [
         "107697492509888512",
         "670259907022553100"
     ],
-    "interaction_source": "true",
+    "source_ephemeral": false,
+    "home_channel": "809417833380708385",
+    "context": "context_compact",
+    "wake_word": "hey_jinx_linux_2021-05-20-utc_v1_9_0.ppn",
+    "speech_lang": "en-IN",
+    "speech_voice": "PrabhatNeural",
+    "speech_rate": "-8",
+    "speech_pitch": "+6",
+    "speech_quota_usage": 10637,
     "activities": [
         "Guild Wars 2",
         "alacren",
@@ -16,16 +24,44 @@
         "Tut-o-matorT69",
         "Adina and chill",
         "practicing RR",
-        "awaiting for you...",
-        "Guild Wars 3 Beta"
+        "Guild Wars 3 Beta",
+        "learning Firebrand cuz meta",
+        "praying to Sand gods",
+        "praying to Air gods",
+        "NA simulator",
+        "in a Bollywood movie"
     ],
-    "context": "context_compact",
-    "wake_word": "hey_jinx_linux_2021-05-20-utc_v1_9_0.ppn",
-    "speech_lang": "en-IN",
-    "speech_voice": "PrabhatNeural",
-    "speech_rate": "-8",
-    "speech_pitch": "+6",
-    "speech_quota_usage": 10058,
+    "toxicity": {
+        "extreme": [
+            "Alright bro you done messed up!",
+            "You either take that back or I break your bones. You choose.",
+            "What the fuck bro!",
+            "If I were you I wouldn't mess with a Bollywood star.",
+            "I have the power of Sand and Air gods on my side.",
+            "I scammed your wife bro."
+        ],
+        "veryhigh": [
+            "And I thought NA was more toxic than this.",
+            "Maybe if you stanned Loona your life would be happier",
+            "Back off bro or else!",
+            "I can hack your computer bro, careful!",
+            "You are getting on my nerves."
+        ],
+        "high": [
+            "Are you flaming me cause I'm Indian? That's racist bro",
+            "Hey, hey! Let's calm down.",
+            "So you've chosen death!",
+            "Woah bro what's up with that attitude.",
+            "My alacrity might be trash but you are being trashy right now."
+        ],
+        "great": [
+            "Ok boomer",
+            "Why you bully me? It's just a game bro.",
+            "Mhm?! What's that?",
+            "Chill bro!",
+            "kekw that's all you got?"
+        ]
+    },
     "intent_response": {
         "hows_alacrity": [
             "40% Alacrity I feel is good for this",
@@ -94,6 +130,8 @@
         ],
         "leave": [
             "Disconnecting!",
+            "See you broski",
+            "God alacren out",
             "Good byee",
             "Alright bro I'm leaving"
         ],
@@ -105,8 +143,9 @@
             "No idea what to do...",
             "Nope sorry try again. Maybe put on an Indian accent, it will help with understanding.",
             "Alacrity: 40%, Me understanding this: 0%",
-            "Microsoft support how may I help you?"
+            "Microsoft support how may I help you?",
+            "Bro, I no understand",
+            "Can Firebrand give alacrity?"
         ]
-    },
-    "home_channel": "809417833380708385"
+    }
 }
