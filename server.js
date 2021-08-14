@@ -1,22 +1,20 @@
 const fs = require(`fs`);
-const Discord = require(`discord.js`);
+const { Client, Intents, Collection, Permissions } = require(`discord.js`);
 const Schedule = require(`node-schedule`);
 const Express = require(`express`);
 const { Wit, log } = require(`node-wit`);
 const { checkToxicity } = require(`./utils/helper`);
 const { errorEmbed } = require(`./utils/embeds`);
-const { reply } = require(`./utils/reply`);
+// const { reply } = require(`./utils/reply`);
 const voiceComprehension = require(`./speech/voiceComprehension`);
 // const qna = require(`./tensorflow/qna`);
 
 // Discord bot
-const myIntents = new Discord.Intents();
-myIntents.add(Discord.Intents.ALL);
-const Bot = new Discord.Client({ intents: myIntents, ws: { intents: myIntents } });
+const Bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 // Load commands
-Bot.commands = new Discord.Collection();
-const cooldowns = new Discord.Collection();
+Bot.commands = new Collection();
+const cooldowns = new Collection();
 const commandFiles = fs.readdirSync(`./commands`).filter(file => file.endsWith(`.js`));
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -38,7 +36,7 @@ const WitAI = new Wit({
 
 // Other constants
 const activities = Bot.config.activities;
-Bot.connUsers = new Discord.Collection();
+Bot.connUsers = new Collection();
 
 // Schedule jobs
 // eslint-disable-next-line no-unused-vars
@@ -91,7 +89,7 @@ Bot.on(`guildCreate`, async (guild) => {
     .catch(console.error);
   // Find first text channel with SEND_MESSAGES permission for @everyone
   const firstChannel = guild.channels.cache.filter(channel => channel.type === `text` && channel.permissionsFor(guild.roles.everyone.id).has(`SEND_MESSAGES`) === true).find(c => c.position === 0);
-  const error = new Discord.Collection();
+  const error = new Collection();
   const errorEmbed1 = errorEmbed();
   errorEmbed1.setDescription(`Hey, I joined but I could not register the following slash commands. Anyway where's TutminatorT92?`);
   const cmds = Bot.commands.filter((cmd) => cmd.options);
@@ -136,7 +134,7 @@ Bot.on(`guildCreate`, async (guild) => {
 });
 
 // On message listener
-Bot.on(`message`, async (message) => {
+Bot.on(`messageCreate`, async (message) => {
   try {
     // Exit if the author is the bot or the bot is not mentioned
     if (message.author.bot || !message.mentions.has(Bot.user)) return;
@@ -160,22 +158,23 @@ Bot.on(`message`, async (message) => {
   }
 });
 
-// On websocket interaction listener
-Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
+// On interaction listener
+Bot.on(`interactionCreate`, async (interaction) => {
   try {
-    const command = Bot.commands.get(interaction.data.name);
+    if (!interaction.isCommand()) return;
+    const command = Bot.commands.get(interaction.commandName);
 
     // Permissions check
     if (command.permissions) {
-      const perms = new Discord.Permissions((interaction.member.permissions - 2147483648));
-      if (!perms || !perms.has(command.permissions)) {return reply(interaction, { type: 4, content: `You do not have the right permissions for this command! (Requires: ${command.permissions})`, flags: 1 << 6 });}
+      const perms = new Permissions((interaction.member.permissions - 2147483648));
+      if (!perms || !perms.has(command.permissions)) {return interaction.reply({ content: `You do not have the right permissions for this command! (Requires: ${command.permissions})`, ephemeral: true });}
     }
 
     // Dev only check
-    if (command.devOnly && !(interaction.member.user.id === `107697492509888512`)) {return reply(interaction, { type: 4, content: `Sorry, this is a developer only command!`, flags: 1 << 6 });}
+    if (command.devOnly && !(interaction.member.user.id === `107697492509888512`)) {return interaction.reply({ content: `Sorry, this is a developer only command!`, ephemeral: true });}
 
     // Check if command has a collection
-    if (!cooldowns.has(command.name)) {cooldowns.set(command.name, new Discord.Collection());}
+    if (!cooldowns.has(command.name)) {cooldowns.set(command.name, new Collection());}
 
     const now = Date.now();
     const timestamps = cooldowns.get(command.name);
@@ -188,7 +187,7 @@ Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
       // Check time elapsed since the last time the user executed the command
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
-        return reply(interaction, { type: 4, content: `Please wait ${Math.round(timeLeft)} more second(s) before reusing the '/${command.name}' command, <@${interaction.member.user.id}>`, flags: 1 << 6 });
+        return interaction.reply({ content: `Please wait ${Math.round(timeLeft)} more second(s) before reusing the '/${command.name}' command, <@${interaction.member.user.id}>`, ephemeral: true });
       }
     }
 
@@ -201,7 +200,7 @@ Bot.ws.on(`INTERACTION_CREATE`, async (interaction) => {
     }
     catch(err) {
       console.error(err);
-      return reply(interaction, { type: 4, content: `There was an error trying to execute that command!`, flags: 1 << 6 });
+      return interaction.reply({ content: `There was an error trying to execute that command!`, ephemeral: true });
     }
   }
   catch(err) {
@@ -265,12 +264,12 @@ Bot.login(Bot.config.token);
 App.listen(3000, () => console.log(`App endpoints listening on port 3000`));
 
 // Lazy things
-process.on(`uncaughtException`, function(err) {
-  console.log(`Caught Exception: ` + err);
-});
-process.on(`unhandledRejection`, function(err) {
-  console.log(`Caught Rejection: ` + err);
-});
+// process.on(`uncaughtException`, function(err) {
+//   console.log(`Caught Exception: ` + err);
+// });
+// process.on(`unhandledRejection`, function(err) {
+//   console.log(`Caught Rejection: ` + err);
+// });
 
 module.exports = {
   Bot: Bot,

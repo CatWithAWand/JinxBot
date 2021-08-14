@@ -1,6 +1,7 @@
-const { reply } = require(`../utils/reply`);
 const { redditEmbed } = require(`../utils/embeds`);
 const ards = require(`ards-client`);
+// eslint-disable-next-line no-unused-vars
+const { CommandInteraction } = require(`discord.js`);
 
 
 module.exports = {
@@ -23,19 +24,25 @@ module.exports = {
     },
   ],
   usage: `/reddit image subreddit: memes`,
+  /**
+   * @param {CommandInteraction} interaction
+   * @return {}
+   */
   async execute(interaction) {
     const ardsClient = new ards.Client();
     const randomSubreddits = [`funny`, `gaming`, `aww`, `pics`, `gifs`, `food`, `Art`, `dataisbeautiful`, `memes`, `wholesomememes`,
       `interestingasfuck`, `WTF`, `oddlysatisfying`, `BlackPeopleTwitter`, `facepalm`, `me_irl`, `dankmemes`, `BikiniBottomTwitter`,
       `ProgrammerHumor`, `photography`, `woahdude`, `reactiongifs`, `PewdiepieSubmissions`, `nextfuckinglevel`, `BetterEveryLoop`,
       `WatchPeopleDieInside`];
-    const subreddit = (interaction.data.options[0].options) ? interaction.data.options[0].options[0].value : randomSubreddits[Math.floor(Math.random() * randomSubreddits.length)];
 
+    const subreddit = (interaction.options.data[0].options) ? interaction.options.data[0].options[0].value : randomSubreddits[Math.floor(Math.random() * randomSubreddits.length)];
     ardsClient.reddit.custom(subreddit).then((res) => {
-      if (!res) return reply(interaction, { type: 4, content: `Subreddit doesn't exist or no images found in specified subreddit!`, flags: 1 << 6 });
+      if (!res) return interaction.reply({ content: `Subreddit doesn't exist or no images found in specified subreddit!`, ephemeral: true });
       const embed = redditEmbed(res);
 
-      return reply(interaction, { type: 4, embeds: [embed] });
+      return interaction.reply({
+        embeds: [embed],
+      });
 
     }).catch(console.error);
   },
